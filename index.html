@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ケトシェイク記録ノート｜KETOneUP</title>
+<meta name="description" content="KETOneUP ケトシェイクを飲んだタイミングを、朝・昼・夜のワンタップで記録できるノートです。">
+<meta name="theme-color" content="#F6C23E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ケトシェイク記録">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Noto+Sans+JP:wght@400;500;700;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF1CF;
+    --cream2:#FFF8E6;
+    --mustard:#F6C23E;
+    --mustard-d:#E3A916;
+    --pink:#F3B6BF;
+    --red:#E50F1E;
+    --tea:#B98A5E;
+    --tea-d:#8C6440;
+    --tea-l:#E8D2B8;
+    --purple:#4A2C82;
+    --ink:#222;
+    --sub:#6b5d4f;
+    --white:#fff;
+    --radius:22px;
+    --shadow:0 6px 0 rgba(74,44,130,.12), 0 14px 30px rgba(140,100,64,.14);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  /* 背景：ブランドページのメインビジュアルにある同心円アーチ */
+  .bg-arcs{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      repeating-radial-gradient(circle at 110% -10%, transparent 0 34px, rgba(243,182,191,.55) 34px 46px, transparent 46px 80px),
+      repeating-radial-gradient(circle at -20% 105%, transparent 0 34px, rgba(246,194,62,.35) 34px 46px, transparent 46px 80px),
+      var(--cream);
+  }
+  .wrap{max-width:460px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 40px)}
+
+  /* ヘッダー */
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .logo{
+    font-family:"Oswald",sans-serif;font-weight:700;color:var(--red);
+    font-size:30px;letter-spacing:-.5px;line-height:1;
+    background:var(--white);padding:8px 12px 7px;border-radius:12px;box-shadow:var(--shadow);
+  }
+  .logo small{display:block;font-family:"Archivo",sans-serif;font-weight:800;font-size:8.5px;letter-spacing:.2px;color:var(--red);margin-top:3px}
+  .head-right{text-align:right}
+  .head-right .ttl{font-weight:900;font-size:15px}
+  .head-right .date{font-family:"Archivo",sans-serif;font-weight:800;font-size:13px;color:var(--tea-d);margin-top:2px}
+
+  /* カード共通 */
+  .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
+  .eyebrow{font-family:"Archivo",sans-serif;font-weight:900;font-size:12px;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase}
+  .h2{font-weight:900;font-size:19px;margin:2px 0 0}
+  .h2 i{font-family:"Fraunces",serif;font-style:italic;font-weight:500}
+
+  /* 今日のカード（パッケージ色：ミルクティー＋紫のライン） */
+  .today{
+    background:linear-gradient(160deg,#C99A6C 0%, var(--tea) 55%, #A97A4E 100%);
+    color:var(--white);padding:20px 18px 22px;
+  }
+  .today::before,.today::after{
+    content:"";position:absolute;border-radius:50%;border:14px solid var(--purple);opacity:.9;
+  }
+  .today::before{width:260px;height:260px;right:-170px;top:-120px}
+  .today::after{width:200px;height:200px;left:-150px;bottom:-130px;border-color:#fff;opacity:.18}
+  .today .eyebrow{color:#fff;opacity:.9}
+  .today-head{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1}
+  .today-title{font-family:"Archivo",sans-serif;font-weight:900;font-size:30px;line-height:.95;letter-spacing:-.5px}
+  .today-title span{display:block;font-family:"Noto Sans JP";font-size:13px;font-weight:700;letter-spacing:0;margin-top:6px;opacity:.95}
+  .count{font-family:"Archivo",sans-serif;font-weight:900;font-size:44px;line-height:1}
+  .count small{font-size:18px;opacity:.85}
+
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;position:relative;z-index:1}
+  .slot{
+    appearance:none;border:none;cursor:pointer;font:inherit;color:var(--tea-d);
+    background:var(--cream2);border-radius:20px;padding:14px 6px 12px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    box-shadow:0 5px 0 rgba(0,0,0,.18);transition:transform .12s ease, box-shadow .12s ease, background .2s;
+    position:relative;
+  }
+  .slot:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+  .slot .lbl{font-weight:900;font-size:18px}
+  .slot .sub{font-family:"Archivo",sans-serif;font-weight:800;font-size:10px;letter-spacing:1px;opacity:.7}
+  .slot .time{font-family:"Archivo",sans-serif;font-weight:800;font-size:11px;height:13px}
+  .cup{width:46px;height:58px}
+  .cup .fill{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+  .slot.done{background:var(--purple);color:#fff}
+  .slot.done .cup .fill{transform:scaleY(1)}
+  .slot.done .check{opacity:1;transform:scale(1)}
+  .check{
+    position:absolute;top:-8px;right:-6px;width:28px;height:28px;border-radius:50%;
+    background:var(--red);color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px;
+    opacity:0;transform:scale(.3);transition:all .3s cubic-bezier(.3,1.6,.5,1);box-shadow:0 3px 8px rgba(0,0,0,.25)
+  }
+  .slot.pop{animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.1)}100%{transform:scale(1)}}
+  .hint{position:relative;z-index:1;font-size:12px;margin-top:14px;opacity:.95;text-align:center}
+
+  /* ストリーク */
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .stat{background:var(--mustard);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .stat.alt{background:var(--white)}
+  .stat .num{font-family:"Archivo",sans-serif;font-weight:900;font-size:46px;line-height:1;margin-top:6px}
+  .stat .num small{font-family:"Noto Sans JP";font-size:14px;font-weight:700;margin-left:2px}
+  .stat .cap{font-size:12px;font-weight:700;margin-top:4px;color:var(--ink)}
+  .stat .flame{position:absolute;right:-10px;bottom:-12px;font-size:64px;opacity:.25}
+  .stat.alt .num{color:var(--purple)}
+
+  /* 体重 */
+  .weight-row{display:flex;gap:10px;margin-top:12px;align-items:stretch}
+  .weight-input{flex:1;position:relative}
+  .weight-input input{
+    width:100%;font-family:"Archivo",sans-serif;font-weight:800;font-size:26px;
+    border:2.5px solid var(--tea-l);border-radius:16px;padding:10px 46px 10px 14px;background:var(--cream2);color:var(--ink);outline:none;
+  }
+  .weight-input input:focus{border-color:var(--purple)}
+  .weight-input .unit{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:800;color:var(--sub)}
+  .btn{appearance:none;border:none;cursor:pointer;font:inherit;font-weight:900;border-radius:16px;padding:0 20px;background:var(--red);color:#fff;box-shadow:0 4px 0 #a80a15;font-size:15px}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a80a15}
+  .btn.ghost{background:var(--cream2);color:var(--purple);box-shadow:0 3px 0 var(--tea-l);padding:10px 14px;font-size:13px}
+  .weight-meta{font-size:12px;color:var(--sub);margin-top:8px;min-height:16px}
+  .weight-meta b{color:var(--purple)}
+  .spark{width:100%;height:84px;margin-top:8px;display:block}
+
+  /* カレンダー */
+  .cal-head{display:flex;align-items:center;justify-content:space-between}
+  .cal-nav{display:flex;gap:6px}
+  .cal-nav button{appearance:none;border:none;width:36px;height:36px;border-radius:50%;background:var(--cream2);color:var(--purple);font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 3px 0 var(--tea-l)}
+  .cal-month{font-family:"Archivo",sans-serif;font-weight:900;font-size:22px}
+  .cal-month i{font-family:"Fraunces",serif;font-weight:500;font-size:16px;color:var(--tea-d);margin-left:4px}
+  .dow,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .dow{margin-top:12px;font-size:11px;font-weight:700;color:var(--sub);text-align:center}
+  .dow span:first-child{color:var(--red)}
+  .dow span:last-child{color:#3a63c4}
+  .grid{margin-top:6px}
+  .day{
+    aspect-ratio:1/1.12;border-radius:12px;background:var(--cream2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    font-family:"Archivo",sans-serif;font-weight:800;font-size:13px;cursor:pointer;border:2px solid transparent;position:relative;
+  }
+  .day.empty{background:transparent;cursor:default}
+  .day.future{opacity:.35;cursor:default}
+  .day.today-mark{border-color:var(--red)}
+  .day.full{background:var(--purple);color:#fff}
+  .day.selected{outline:3px solid var(--mustard);outline-offset:1px}
+  .dots{display:flex;gap:2.5px}
+  .dots i{width:6px;height:6px;border-radius:50%;background:var(--tea-l)}
+  .dots i.on{background:var(--tea-d)}
+  .day.full .dots i.on{background:var(--mustard)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--sub);margin-top:12px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+
+  /* 日付詳細シート */
+  .sheet-bg{position:fixed;inset:0;background:rgba(34,20,60,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+  .sheet-bg.open{opacity:1;pointer-events:auto}
+  .sheet{
+    position:fixed;left:50%;bottom:0;width:100%;max-width:460px;transform:translate(-50%,105%);
+    background:var(--white);border-radius:26px 26px 0 0;padding:16px 18px calc(env(safe-area-inset-bottom) + 22px);z-index:21;
+    transition:transform .3s cubic-bezier(.2,.9,.3,1), visibility 0s .3s;visibility:hidden;
+  }
+  .sheet.open{transform:translate(-50%,0);visibility:visible;transition:transform .3s cubic-bezier(.2,.9,.3,1)}
+  .grab{width:44px;height:5px;border-radius:3px;background:var(--tea-l);margin:0 auto 12px}
+  .sheet .slots{margin-top:12px}
+  .sheet .slot{background:var(--cream2)}
+  .sheet .slot.done{background:var(--purple)}
+  .sheet-note{font-size:12px;color:var(--sub);margin-top:12px}
+  .sheet .weight-row{margin-top:14px}
+
+  /* ホーム画面追加の案内 */
+  .a2hs{background:var(--purple);color:#fff;border-radius:var(--radius);padding:16px 16px 14px;margin-bottom:16px;box-shadow:var(--shadow);position:relative}
+  .a2hs .h2{color:#fff;font-size:16px;padding-right:28px}
+  .a2hs p{font-size:12.5px;line-height:1.7;margin:8px 0 0}
+  .a2hs ol{font-size:13px;line-height:1.8;margin:8px 0 0;padding-left:20px}
+  .a2hs ol b{color:var(--mustard)}
+  .a2hs .close{position:absolute;top:10px;right:10px;appearance:none;border:none;background:rgba(255,255,255,.18);color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer}
+  .a2hs .tabs{display:flex;gap:6px;margin-top:10px}
+  .a2hs .tabs button{appearance:none;border:none;border-radius:999px;padding:5px 12px;font:inherit;font-size:12px;font-weight:700;background:rgba(255,255,255,.15);color:#fff;cursor:pointer}
+  .a2hs .tabs button.on{background:var(--mustard);color:var(--ink)}
+
+  /* その他 */
+  .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .notice{font-size:11px;color:var(--sub);line-height:1.7;margin-top:10px}
+  footer{text-align:center;margin-top:8px}
+  .shop-link{display:inline-block;margin-top:6px;font-weight:900;font-size:14px;color:var(--ink);background:var(--white);border:2px solid var(--ink);border-radius:10px;padding:10px 16px;text-decoration:none}
+  .shop-link::after{content:" ▶"}
+  .copy{font-size:11px;color:var(--sub);margin-top:14px}
+  .copy b{font-family:"Oswald";color:var(--red);font-weight:700}
+
+  .toast{
+    position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translate(-50%,20px);
+    background:var(--ink);color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:999px;opacity:0;transition:all .25s;z-index:40;white-space:nowrap
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .burst{position:fixed;pointer-events:none;z-index:30;font-family:"Archivo";font-weight:900;color:var(--red);font-size:20px;animation:burst .9s ease-out forwards}
+  @keyframes burst{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-60px) scale(1.15)}}
+  .confetti{position:fixed;width:9px;height:14px;z-index:30;pointer-events:none;border-radius:2px;animation:fall 1.4s ease-in forwards}
+  @keyframes fall{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="bg-arcs"></div>
+<div class="wrap">
+
+  <header>
+    <div class="logo">KETOneUP<small>New Energy for The Body</small></div>
+    <div class="head-right">
+      <div class="ttl">ケトシェイク記録ノート</div>
+      <div class="date" id="headDate"></div>
+    </div>
+  </header>
+
+  <!-- ホーム画面追加の案内 -->
+  <section class="a2hs hidden" id="a2hs">
+    <button class="close" id="a2hsClose" aria-label="閉じる">×</button>
+    <div class="h2">ホーム画面に追加して使ってください</div>
+    <p>記録はこのスマホの中に保存されます。iPhoneのSafariでは、ホーム画面に追加しないまま7日間開かないと記録が消えることがあります。</p>
+    <div class="tabs">
+      <button data-os="ios">iPhone</button>
+      <button data-os="android">Android</button>
+    </div>
+    <ol id="a2hsIos">
+      <li>Safariで画面下の <b>共有ボタン（□に↑）</b> をタップ</li>
+      <li>メニューから <b>「ホーム画面に追加」</b> を選ぶ</li>
+      <li>右上の <b>「追加」</b> をタップ</li>
+    </ol>
+    <ol id="a2hsAndroid" class="hidden">
+      <li>Chromeで右上の <b>︙（メニュー）</b> をタップ</li>
+      <li><b>「ホーム画面に追加」</b> または <b>「アプリをインストール」</b> を選ぶ</li>
+      <li><b>「追加」</b> をタップ</li>
+    </ol>
+  </section>
+
+  <!-- 今日 -->
+  <section class="card today">
+    <div class="today-head">
+      <div>
+        <div class="eyebrow">Today's Shake</div>
+        <div class="today-title">KETO<br>DIET SHAKE<span>今日飲んだらタップ</span></div>
+      </div>
+      <div class="count" id="todayCount">0<small>/3</small></div>
+    </div>
+    <div class="slots" id="todaySlots"></div>
+    <div class="hint" id="todayHint">もう一度タップすると取り消せます</div>
+  </section>
+
+  <!-- 連続日数 -->
+  <section class="stats">
+    <div class="stat">
+      <div class="eyebrow" style="color:var(--ink)">Streak</div>
+      <div class="num" id="streak">0<small>日</small></div>
+      <div class="cap">連続で記録中</div>
+      <div class="flame">🔥</div>
+    </div>
+    <div class="stat alt">
+      <div class="eyebrow">This Month</div>
+      <div class="num" id="monthTotal">0<small>杯</small></div>
+      <div class="cap" id="monthCap">今月飲んだ回数</div>
+    </div>
+  </section>
+
+  <!-- 体重 -->
+  <section class="card">
+    <div class="eyebrow">Weight Memo</div>
+    <div class="h2">今日の体重 <i>memo</i></div>
+    <div class="weight-row">
+      <div class="weight-input">
+        <input type="number" inputmode="decimal" step="0.1" min="20" max="300" id="weightInput" placeholder="00.0">
+        <span class="unit">kg</span>
+      </div>
+      <button class="btn" id="weightSave">記録</button>
+    </div>
+    <div class="weight-meta" id="weightMeta"></div>
+    <svg class="spark" id="spark" viewBox="0 0 400 84" preserveAspectRatio="none" aria-label="体重の推移（直近30日）"></svg>
+  </section>
+
+  <!-- カレンダー -->
+  <section class="card">
+    <div class="cal-head">
+      <div>
+        <div class="eyebrow">History</div>
+        <div class="cal-month" id="calMonth"></div>
+      </div>
+      <div class="cal-nav">
+        <button id="calPrev" aria-label="前の月">‹</button>
+        <button id="calNext" aria-label="次の月">›</button>
+      </div>
+    </div>
+    <div class="dow"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
+    <div class="grid" id="calGrid"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--purple)"></i>朝・昼・夜すべて</span>
+      <span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span>●＝飲んだ回</span>
+      <span>日付をタップで修正</span>
+    </div>
+  </section>
+
+  <!-- データ -->
+  <section class="card">
+    <div class="eyebrow">Data</div>
+    <div class="h2">記録のバックアップ</div>
+    <div class="notice">機種変更の前に「書き出し」でファイルを保存し、新しいスマホで「読み込み」すると記録を引き継げます。</div>
+    <div class="tools">
+      <button class="btn ghost" id="exportBtn">書き出し</button>
+      <button class="btn ghost" id="importBtn">読み込み</button>
+      <button class="btn ghost" id="a2hsShow">ホーム画面追加の方法</button>
+      <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+    </div>
+    <div class="notice">記録はお使いのスマホの中だけに保存され、勝山館を含む外部には送信されません。体重の記録は目安です。体調に不安がある場合は医師にご相談ください。</div>
+  </section>
+
+  <footer>
+    <a class="shop-link" href="https://www.shozankan-shop.com/ext/ketoneup/about.html" target="_blank" rel="noopener">KETOneUPの商品を見る</a>
+    <div class="copy"><b>KETOneUP</b>｜MCT＆KETO専門店 勝山館</div>
+  </footer>
+</div>
+
+<!-- 日付詳細シート -->
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <div class="eyebrow">Edit Record</div>
+  <div class="h2" id="sheetTitle"></div>
+  <div class="slots" id="sheetSlots"></div>
+  <div class="weight-row">
+    <div class="weight-input">
+      <input type="number" inputmode="decimal" step="0.1" min="20" max="300" id="sheetWeight" placeholder="00.0">
+      <span class="unit">kg</span>
+    </div>
+    <button class="btn" id="sheetWeightSave">保存</button>
+  </div>
+  <div class="sheet-note">飲み忘れた日の記録を後から付けたり、間違えた記録を取り消したりできます。</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const KEY = 'ketoneup_shake_log_v1';
+  const SLOTS = [
+    {id:'m', label:'朝', sub:'MORNING'},
+    {id:'n', label:'昼', sub:'NOON'},
+    {id:'e', label:'夜', sub:'NIGHT'}
+  ];
+
+  // ---------- 保存処理 ----------
+  let memoryOnly = false;
+  function load(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      const d = raw ? JSON.parse(raw) : null;
+      if(d && d.days) return d;
+    }catch(e){ memoryOnly = true; }
+    return {version:1, days:{}};
+  }
+  let db = load();
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(db)); }
+    catch(e){ if(!memoryOnly){ memoryOnly = true; toast('この環境では記録を保存できません'); } }
+  }
+  // 可能なブラウザでは保存領域を「消されにくい」設定にする
+  if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().catch(()=>{}); }
+
+  // ---------- 日付ユーティリティ ----------
+  const pad = n => String(n).padStart(2,'0');
+  const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+  const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+  const WD = ['日','月','火','水','木','金','土'];
+  const fmtJP = d => `${d.getMonth()+1}月${d.getDate()}日（${WD[d.getDay()]}）`;
+  const getDay = k => db.days[k] || {};
+  const countOf = k => { const d = getDay(k); return SLOTS.filter(s => d[s.id]).length; };
+  function cleanDay(k){
+    const d = db.days[k]; if(!d) return;
+    if(!SLOTS.some(s => d[s.id]) && d.w == null) delete db.days[k];
+  }
+
+  // ---------- カップのSVG ----------
+  function cupSVG(uid){
+    return `<svg class="cup" viewBox="0 0 46 58" aria-hidden="true">
+      <defs><clipPath id="c${uid}"><path d="M8 14 L38 14 L34 54 Q34 56 32 56 L14 56 Q12 56 12 54 Z"/></clipPath></defs>
+      <line x1="27" y1="2" x2="31" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <g clip-path="url(#c${uid})">
+        <rect class="fill" x="0" y="20" width="46" height="40" fill="#D7B48E"/>
+        <path class="fill" d="M0 22 Q11 18 23 22 T46 22 L46 26 L0 26Z" fill="#F3E3CF"/>
+      </g>
+      <path d="M8 14 L38 14 L34 54 Q34 56 32 56 L14 56 Q12 56 12 54 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="5" y="10" width="36" height="5" rx="2.5" fill="currentColor"/>
+    </svg>`;
+  }
+
+  function renderSlots(container, k, prefix){
+    const d = getDay(k);
+    container.innerHTML = SLOTS.map(s => {
+      const on = !!d[s.id];
+      const t = on && typeof d[s.id] === 'string' ? d[s.id] : '';
+      return `<button class="slot ${on?'done':''}" data-slot="${s.id}" aria-pressed="${on}">
+        <span class="check">✓</span>
+        ${cupSVG(prefix+s.id)}
+        <span class="lbl">${s.label}</span>
+        <span class="sub">${s.sub}</span>
+        <span class="time">${t}</span>
+      </button>`;
+    }).join('');
+    container.querySelectorAll('.slot').forEach(btn => {
+      btn.addEventListener('click', () => toggle(k, btn.dataset.slot, btn));
+    });
+  }
+
+  function toggle(k, slot, btn){
+    const d = db.days[k] || (db.days[k] = {});
+    const label = SLOTS.find(s => s.id === slot).label;
+    if(d[slot]){
+      delete d[slot];
+      toast(`${label}の記録を取り消しました`);
+    }else{
+      const now = new Date();
+      d[slot] = (k === keyOf(today())) ? `${pad(now.getHours())}:${pad(now.getMinutes())}` : true;
+      burst(btn, '+1');
+      if(navigator.vibrate) navigator.vibrate(18);
+      if(countOf(k) === 3) celebrate();
+      else toast(`${label}のケトシェイクを記録しました`);
+    }
+    cleanDay(k);
+    save();
+    renderAll();
+    if(sheetKey) renderSheet();
+    const again = document.querySelector(`#${sheetKey === k && sheetOpen ? 'sheetSlots' : 'todaySlots'} [data-slot="${slot}"]`);
+    if(again){ again.classList.add('pop'); }
+  }
+
+  // ---------- 今日 ----------
+  function renderToday(){
+    const k = keyOf(today());
+    document.getElementById('headDate').textContent = fmtJP(today());
+    renderSlots(document.getElementById('todaySlots'), k, 't');
+    const c = countOf(k);
+    document.getElementById('todayCount').innerHTML = `${c}<small>/3</small>`;
+    document.getElementById('todayHint').textContent =
+      c === 3 ? '今日の3回分、すべて記録できました' : 'もう一度タップすると取り消せます';
+  }
+
+  // ---------- 連続日数・今月 ----------
+  function streak(){
+    let d = today(), n = 0;
+    if(countOf(keyOf(d)) === 0) d.setDate(d.getDate()-1); // 今日まだ未記録でも昨日までの連続は維持
+    while(countOf(keyOf(d)) > 0){ n++; d.setDate(d.getDate()-1); }
+    return n;
+  }
+  function renderStats(){
+    document.getElementById('streak').innerHTML = `${streak()}<small>日</small>`;
+    const t = today(), ym = `${t.getFullYear()}-${pad(t.getMonth()+1)}`;
+    let total = 0, days = 0;
+    Object.keys(db.days).forEach(k => { if(k.startsWith(ym)){ const c = countOf(k); total += c; if(c) days++; } });
+    document.getElementById('monthTotal').innerHTML = `${total}<small>杯</small>`;
+    document.getElementById('monthCap').textContent = `今月飲んだ回数（${days}日）`;
+  }
+
+  // ---------- 体重 ----------
+  function validWeight(v){ const n = parseFloat(v); return (!isNaN(n) && n >= 20 && n <= 300) ? Math.round(n*10)/10 : null; }
+  function setWeight(k, val){
+    const w = validWeight(val);
+    if(val === '' || val == null){
+      if(db.days[k]) delete db.days[k].w;
+      cleanDay(k); save(); renderAll(); toast('体重の記録を消しました'); return true;
+    }
+    if(w == null){ toast('20〜300kgの範囲で入力してください'); return false; }
+    (db.days[k] || (db.days[k] = {})).w = w;
+    save(); renderAll(); toast(`${w}kg を記録しました`); return true;
+  }
+  function weightSeries(days){
+    const out = []; const t = today();
+    for(let i = days-1; i >= 0; i--){
+      const d = new Date(t); d.setDate(d.getDate()-i);
+      const w = getDay(keyOf(d)).w;
+      if(w != null) out.push({i: days-1-i, w, k: keyOf(d)});
+    }
+    return out;
+  }
+  function renderWeight(){
+    const k = keyOf(today());
+    const inp = document.getElementById('weightInput');
+    if(document.activeElement !== inp) inp.value = getDay(k).w ?? '';
+    const s = weightSeries(30);
+    const meta = document.getElementById('weightMeta');
+    const svg = document.getElementById('spark');
+    if(s.length === 0){
+      meta.textContent = '体重を記録すると、直近30日の推移がグラフで表示されます。';
+      svg.innerHTML = '';
+      return;
+    }
+    const first = s[0], last = s[s.length-1];
+    const diff = Math.round((last.w - first.w)*10)/10;
+    meta.innerHTML = s.length > 1
+      ? `直近30日：${first.w}kg → <b>${last.w}kg</b>（${diff > 0 ? '+' : ''}${diff}kg）`
+      : `最新の記録：<b>${last.w}kg</b>`;
+    const ws = s.map(p => p.w), min = Math.min(...ws), max = Math.max(...ws);
+    const range = Math.max(max - min, 1);
+    const X = i => 12 + i * (376/29);
+    const Y = w => 70 - ((w - min) / range) * 56;
+    const pts = s.map(p => `${X(p.i).toFixed(1)},${Y(p.w).toFixed(1)}`).join(' ');
+    svg.innerHTML = `
+      <line x1="0" y1="78" x2="400" y2="78" stroke="#E8D2B8" stroke-width="2"/>
+      ${s.length > 1 ? `<polyline points="${pts}" fill="none" stroke="#4A2C82" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>` : ''}
+      ${s.map((p, idx) => `<circle cx="${X(p.i).toFixed(1)}" cy="${Y(p.w).toFixed(1)}" r="${idx === s.length-1 ? 6 : 3.5}" fill="${idx === s.length-1 ? '#E50F1E' : '#4A2C82'}"/>`).join('')}
+    `;
+  }
+  document.getElementById('weightSave').addEventListener('click', () => {
+    setWeight(keyOf(today()), document.getElementById('weightInput').value.trim());
+    document.getElementById('weightInput').blur();
+  });
+  document.getElementById('weightInput').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('weightSave').click(); });
+
+  // ---------- カレンダー ----------
+  let calY = today().getFullYear(), calM = today().getMonth();
+  const MONTH_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function renderCal(){
+    document.getElementById('calMonth').innerHTML = `${calY}.${pad(calM+1)}<i>${MONTH_EN[calM]}</i>`;
+    const first = new Date(calY, calM, 1), days = new Date(calY, calM+1, 0).getDate();
+    const t = today(), tk = keyOf(t);
+    let html = '';
+    for(let i = 0; i < first.getDay(); i++) html += '<div class="day empty"></div>';
+    for(let d = 1; d <= days; d++){
+      const dt = new Date(calY, calM, d), k = keyOf(dt), day = getDay(k), c = countOf(k);
+      const future = dt > t;
+      const cls = ['day', future ? 'future' : '', c === 3 ? 'full' : '', k === tk ? 'today-mark' : '', (sheetOpen && k === sheetKey) ? 'selected' : ''].join(' ');
+      html += `<div class="${cls}" data-k="${k}" ${future ? '' : 'role="button" tabindex="0"'} aria-label="${fmtJP(dt)} ${c}回">
+        <span>${d}</span>
+        <span class="dots">${SLOTS.map(s => `<i class="${day[s.id] ? 'on' : ''}"></i>`).join('')}</span>
+      </div>`;
+    }
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = html;
+    grid.querySelectorAll('.day[role="button"]').forEach(el => {
+      el.addEventListener('click', () => openSheet(el.dataset.k));
+    });
+    const nextDisabled = (calY > t.getFullYear()) || (calY === t.getFullYear() && calM >= t.getMonth());
+    document.getElementById('calNext').style.visibility = nextDisabled ? 'hidden' : 'visible';
+  }
+  document.getElementById('calPrev').addEventListener('click', () => { calM--; if(calM < 0){ calM = 11; calY--; } renderCal(); });
+  document.getElementById('calNext').addEventListener('click', () => { calM++; if(calM > 11){ calM = 0; calY++; } renderCal(); });
+
+  // ---------- 日付詳細シート ----------
+  let sheetKey = null, sheetOpen = false;
+  const sheet = document.getElementById('sheet'), sheetBg = document.getElementById('sheetBg');
+  function openSheet(k){
+    sheetKey = k; sheetOpen = true;
+    renderSheet();
+    sheet.classList.add('open'); sheetBg.classList.add('open');
+    renderCal();
+  }
+  function closeSheet(){
+    sheetOpen = false;
+    sheet.classList.remove('open'); sheetBg.classList.remove('open');
+    renderCal();
+  }
+  function renderSheet(){
+    document.getElementById('sheetTitle').textContent = fmtJP(parseKey(sheetKey)) + ' の記録';
+    renderSlots(document.getElementById('sheetSlots'), sheetKey, 's');
+    const w = getDay(sheetKey).w;
+    const inp = document.getElementById('sheetWeight');
+    if(document.activeElement !== inp) inp.value = w ?? '';
+  }
+  sheetBg.addEventListener('click', closeSheet);
+  document.getElementById('sheetWeightSave').addEventListener('click', () => {
+    if(setWeight(sheetKey, document.getElementById('sheetWeight').value.trim())) document.getElementById('sheetWeight').blur();
+  });
+  let touchY = null;
+  sheet.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, {passive:true});
+  sheet.addEventListener('touchend', e => { if(touchY != null && e.changedTouches[0].clientY - touchY > 70) closeSheet(); touchY = null; });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && sheetOpen) closeSheet(); });
+
+  // ---------- ホーム画面追加の案内 ----------
+  const A2HS_KEY = 'ketoneup_a2hs_closed';
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const a2hs = document.getElementById('a2hs');
+  function setOS(os){
+    a2hs.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.os === os));
+    document.getElementById('a2hsIos').classList.toggle('hidden', os !== 'ios');
+    document.getElementById('a2hsAndroid').classList.toggle('hidden', os !== 'android');
+  }
+  setOS(isIOS ? 'ios' : 'android');
+  a2hs.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => setOS(b.dataset.os)));
+  let closedBefore = false;
+  try{ closedBefore = localStorage.getItem(A2HS_KEY) === '1'; }catch(e){}
+  if(!isStandalone && !closedBefore) a2hs.classList.remove('hidden');
+  document.getElementById('a2hsClose').addEventListener('click', () => {
+    a2hs.classList.add('hidden');
+    try{ localStorage.setItem(A2HS_KEY, '1'); }catch(e){}
+  });
+  document.getElementById('a2hsShow').addEventListener('click', () => {
+    a2hs.classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  // ---------- バックアップ ----------
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    const t = today();
+    a.href = URL.createObjectURL(blob);
+    a.download = `${t.getFullYear()}${pad(t.getMonth()+1)}${pad(t.getDate())}_ケトシェイク記録.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('記録ファイルを書き出しました');
+  });
+  document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const d = JSON.parse(r.result);
+        if(!d || typeof d.days !== 'object') throw new Error('format');
+        // 既存の記録と合体（同じ日はファイル側を優先）
+        Object.entries(d.days).forEach(([k, v]) => {
+          if(/^\d{4}-\d{2}-\d{2}$/.test(k) && v && typeof v === 'object'){
+            const clean = {};
+            SLOTS.forEach(s => { if(v[s.id]) clean[s.id] = typeof v[s.id] === 'string' ? v[s.id].slice(0,5) : true; });
+            const w = validWeight(v.w); if(w != null) clean.w = w;
+            if(Object.keys(clean).length) db.days[k] = Object.assign({}, db.days[k], clean);
+          }
+        });
+        save(); renderAll(); toast('記録を読み込みました');
+      }catch(err){ toast('読み込めないファイルです'); }
+      e.target.value = '';
+    };
+    r.readAsText(f);
+  });
+
+  // ---------- 演出 ----------
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1900);
+  }
+  function burst(el, text){
+    const r = el.getBoundingClientRect();
+    const b = document.createElement('div');
+    b.className = 'burst'; b.textContent = text;
+    b.style.left = (r.left + r.width/2) + 'px'; b.style.top = (r.top - 4) + 'px';
+    document.body.appendChild(b); setTimeout(() => b.remove(), 950);
+  }
+  function celebrate(){
+    toast('朝・昼・夜コンプリート！');
+    const colors = ['#E50F1E','#4A2C82','#F6C23E','#F3B6BF','#B98A5E'];
+    for(let i = 0; i < 36; i++){
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = (window.innerWidth/2) + 'px';
+      c.style.top = (window.innerHeight*0.35) + 'px';
+      c.style.background = colors[i % colors.length];
+      c.style.setProperty('--dx', (Math.random()*320 - 160) + 'px');
+      c.style.setProperty('--dy', (Math.random()*380 + 80) + 'px');
+      c.style.setProperty('--r', (Math.random()*720 - 360) + 'deg');
+      c.style.animationDelay = (Math.random()*0.15) + 's';
+      document.body.appendChild(c); setTimeout(() => c.remove(), 1700);
+    }
+    if(navigator.vibrate) navigator.vibrate([20,40,20]);
+  }
+
+  // ---------- 全体描画 ----------
+  function renderAll(){ renderToday(); renderStats(); renderWeight(); renderCal(); }
+  renderAll();
+
+  // 日付をまたいで開きっぱなしの場合に備えて、画面に戻ったら更新
+  let lastKey = keyOf(today());
+  document.addEventListener('visibilitychange', () => {
+    if(!document.hidden){
+      db = load();
+      if(keyOf(today()) !== lastKey){ lastKey = keyOf(today()); calY = today().getFullYear(); calM = today().getMonth(); }
+      renderAll();
+    }
+  });
+})();
+</script>
+</body>
+</html>

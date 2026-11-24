@@ -48,6 +48,8 @@ URLの末尾に `?today=2027-01-16` のように日付を付けると、その�
 | index.html | ツール本体 |
 | manifest.json | ホーム画面に追加したときの名前・色・アイコン |
 | icon-192.png / icon-512.png / apple-touch-icon.png | アイコン |
+| logo.png | ロゴ（支給画像） |
+| og-image.png | LINEやSNSでリンクを共有したときに出る画像（1200×630） |
 
 ## GitHub Pagesでの公開手順
 

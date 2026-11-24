@@ -1,0 +1,20 @@
+{
+  "note": "仮データ。動画は公式ショート再生リストから選んだもの。質問文と回答文は動画タイトルをもとにした仮の文言です。",
+  "playlist": "https://www.youtube.com/playlist?list=PL6fyL34-riv0uIKZQgsnP3yUU0fd-cHkK",
+  "categories": ["シェイク", "MCTオイル", "ケトン体", "そのほかの商品"],
+  "items": [
+    {"category": "シェイク", "q": "ケトダイエットシェイクは、どんな商品ですか？", "a": "ミルクティー味とチョコレート味の2種類があります。動画で商品を紹介しています。", "videoId": "c8IGUA6zVoA", "start": 0, "vertical": true},
+    {"category": "シェイク", "q": "置き換えシェイクは、どんな味ですか？", "a": "おやつ感覚で飲める味わいを、動画で紹介しています。", "videoId": "K9ro89XEOTY", "start": 0, "vertical": true},
+    {"category": "シェイク", "q": "「カロリーオフじゃない」シェイクとは、どういうことですか？", "a": "ケトダイエットシェイクの考え方を、動画で解説しています。", "videoId": "Y5Sm5h9geJM", "start": 0, "vertical": true},
+    {"category": "MCTオイル", "q": "MCTオイルとは何ですか？どうやって使いますか？", "a": "KETO先生が、MCTオイルの基本と使い方を解説しています。", "videoId": "VXhd1-_oiOI", "start": 0, "vertical": true},
+    {"category": "MCTオイル", "q": "MCTオイルは、何にかけたり混ぜたりすればいいですか？", "a": "かける・混ぜるの簡単な使い方を、動画で紹介しています。", "videoId": "IF43d3sWcjc", "start": 0, "vertical": true},
+    {"category": "MCTオイル", "q": "MCTオイルでお腹がゆるくなったときは、どうすればいいですか？", "a": "量の調整など、気をつけたいポイントを動画で解説しています。", "videoId": "vIQ86ZHycF0", "start": 0, "vertical": true},
+    {"category": "MCTオイル", "q": "MCTオイルをとりすぎると、どうなりますか？", "a": "とる量の目安と注意点を、動画で解説しています。", "videoId": "JGNKaqp6llw", "start": 0, "vertical": true},
+    {"category": "MCTオイル", "q": "粉タイプのMCTもありますか？", "a": "粉タイプのMCTについて、動画で紹介しています。", "videoId": "nNstBkbb310", "start": 0, "vertical": true},
+    {"category": "MCTオイル", "q": "MCTオイルを使ったドレッシングの作り方は？", "a": "1分で作れる手作りドレッシングを、動画で紹介しています。", "videoId": "r2JV8wRxkqc", "start": 0, "vertical": true},
+    {"category": "ケトン体", "q": "BHBとは何ですか？MCTオイルとの違いは？", "a": "BHBとMCTオイルの違いを、動画で簡単に解説しています。", "videoId": "SfarTqEma64", "start": 0, "vertical": true},
+    {"category": "ケトン体", "q": "1日の中で、ケトン体をどう取り入れればいいですか？", "a": "1日のルーティンの例を、動画で紹介しています。", "videoId": "dHV5GTsClmU", "start": 0, "vertical": true},
+    {"category": "そのほかの商品", "q": "ケトバターコーヒーとは何ですか？", "a": "KETO先生が、ケトバターコーヒーについて解説しています。", "videoId": "xf67u7xwf9o", "start": 0, "vertical": true},
+    {"category": "そのほかの商品", "q": "ケトスイートとは何ですか？どうやって使いますか？", "a": "KETO先生が、ケトスイートの使い方を解説しています。", "videoId": "a3u8eHFzB8U", "start": 0, "vertical": true}
+  ]
+}

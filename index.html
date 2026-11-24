@@ -268,6 +268,27 @@
   @keyframes burst{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-60px) scale(1.15)}}
   .confetti{position:fixed;width:9px;height:14px;z-index:46;pointer-events:none;border-radius:2px;animation:fall 1.6s ease-in forwards}
   @keyframes fall{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+  /* Q&A */
+  .qa-search{width:100%;font-family:inherit;font-size:15px;border:2.5px solid var(--tea-l);border-radius:14px;padding:11px 14px;background:var(--cream2);outline:none;margin-top:12px}
+  .qa-search:focus{border-color:var(--purple)}
+  .qa-cats{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .qa-cat{appearance:none;border:2px solid var(--tea-l);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer}
+  .qa-cat.on{background:var(--purple);border-color:var(--purple);color:#fff}
+  .qa-list{margin-top:10px}
+  .qa-item{border-bottom:1px solid var(--tea-l)}
+  .qa-q{appearance:none;border:none;background:none;width:100%;text-align:left;display:flex;gap:10px;align-items:flex-start;padding:13px 2px;cursor:pointer;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.55}
+  .qa-q .mk{flex:none;width:24px;height:24px;border-radius:50%;background:var(--mustard);display:grid;place-items:center;font-family:"Archivo",sans-serif;font-weight:900;font-size:12px}
+  .qa-q .ar{margin-left:auto;flex:none;color:var(--sub);transition:transform .2s}
+  .qa-item.open .qa-q .ar{transform:rotate(180deg)}
+  .qa-a{display:none;padding:0 2px 14px 34px;font-size:13.5px;line-height:1.75;color:#3a3128}
+  .qa-item.open .qa-a{display:block}
+  .qa-play{display:inline-flex;align-items:center;gap:8px;margin-top:10px;appearance:none;border:none;cursor:pointer;background:var(--red);color:#fff;font-weight:900;font-size:13px;border-radius:999px;padding:9px 14px;box-shadow:0 3px 0 #a80a15}
+  .qa-play:active{transform:translateY(2px);box-shadow:0 1px 0 #a80a15}
+  .qa-empty{font-size:13px;color:var(--sub);padding:14px 2px}
+  .video-wrap{position:relative;width:100%;margin-top:12px;border-radius:16px;overflow:hidden;background:#000}
+  .video-wrap.v{max-width:min(100%, calc(68vh * 9 / 16));aspect-ratio:9/16;margin-left:auto;margin-right:auto}
+  .video-wrap.h{aspect-ratio:16/9}
+  .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .hidden{display:none !important}
 </style>
 </head>
@@ -309,7 +330,7 @@
             <div class="pv-ico" style="background:#EFE8FA">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A2C82" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
             </div>
-            <div><b>勝山館には送信されません</b><span>記録はこのスマホの中だけに保存され、当社が記録を見ることはありません。</span></div>
+            <div><b>勝山館には送信されません</b><span>記録はこのスマホの中だけに保存され、当社が記録を見ることはありません。Q&amp;Aの動画を再生したときは、YouTube（Google）に接続します。</span></div>
           </div>
           <div class="pv-item">
             <div class="pv-ico" style="background:#FDEBEE">
@@ -392,6 +413,16 @@
     </ul>
     <div class="perk"><b>完走特典</b>のご案内は、オープンチャットでお知らせします。</div>
     <div class="tools"><a class="btn ghost" style="text-decoration:none" href="https://www.shozankan-shop.com/ext/ketoneup/about.html" target="_blank" rel="noopener">KETOneUPの商品・定期便を見る</a></div>
+  </section>
+
+  <!-- Q&A（動画で解説） -->
+  <section class="card" id="qaCard">
+    <div class="eyebrow">Q&amp;A</div>
+    <div class="h2">よくある質問 <i>movie</i></div>
+    <p class="muted" style="margin:6px 0 0">質問をタップすると、答えと解説動画が見られます。</p>
+    <input class="qa-search" id="qaSearch" type="search" placeholder="キーワードで探す（例：MCT）" aria-label="質問をキーワードで探す">
+    <div class="qa-cats" id="qaCats"></div>
+    <div class="qa-list" id="qaList"></div>
   </section>
 
   <section class="stats">
@@ -785,7 +816,7 @@
     panel.classList.add('open'); sheetBg.classList.add('open'); panelOpen = true;
     if(onMount) onMount(document.getElementById('panelBody'));
   }
-  function closePanel(){ if(!panelOpen) return; panelOpen = false; panel.classList.remove('open'); if(!sheetOpen) sheetBg.classList.remove('open'); }
+  function closePanel(){ if(!panelOpen) return; panelOpen = false; panel.classList.remove('open'); if(!sheetOpen) sheetBg.classList.remove('open'); document.getElementById('panelBody').querySelectorAll('iframe').forEach(f => f.remove()); }
   document.getElementById('panelClose').addEventListener('click', closePanel);
   sheetBg.addEventListener('click', () => { closeSheet(); closePanel(); });
   [sheet, panel].forEach(el => {
@@ -834,7 +865,7 @@
       <div class="tools"><button class="btn ghost" id="exportBtn">書き出し</button><button class="btn ghost" id="importBtn">読み込み</button></div>
       <h3>そのほか</h3>
       <div class="tools"><button class="btn ghost" id="showOnb">ご利用の前にを見る</button><button class="btn ghost" id="showA2hs">ホーム画面追加の方法</button></div>
-      <div class="notice">記録はお使いのスマホの中だけに保存され、勝山館を含む外部には送信されません。体重の記録は目安です。体調に不安がある場合は医師にご相談ください。</div>
+      <div class="notice">記録はお使いのスマホの中だけに保存され、勝山館を含む外部には送信されません。Q&amp;Aの動画を再生したときは、YouTube（Google）に接続します（記録の内容は送信されません）。体重の記録は目安です。体調に不安がある場合は医師にご相談ください。</div>
     `, root => {
       bindChooser(root.querySelector('#setCourse'), tmp);
       root.querySelector('#setCourseSave').addEventListener('click', () => {
@@ -1238,9 +1269,52 @@
     if(navigator.vibrate) navigator.vibrate([20,40,20]);
   }
 
+  // ================= Q&A（動画で解説） =================
+  // 中身は qa.json で管理する。読み込めないとき（ファイルを直接開いた場合など）は下の初期データを使う。
+  const QA_FALLBACK = {"note": "仮データ。動画は公式ショート再生リストから選んだもの。質問文と回答文は動画タイトルをもとにした仮の文言です。", "playlist": "https://www.youtube.com/playlist?list=PL6fyL34-riv0uIKZQgsnP3yUU0fd-cHkK", "categories": ["シェイク", "MCTオイル", "ケトン体", "そのほかの商品"], "items": [{"category": "シェイク", "q": "ケトダイエットシェイクは、どんな商品ですか？", "a": "ミルクティー味とチョコレート味の2種類があります。動画で商品を紹介しています。", "videoId": "c8IGUA6zVoA", "start": 0, "vertical": true}, {"category": "シェイク", "q": "置き換えシェイクは、どんな味ですか？", "a": "おやつ感覚で飲める味わいを、動画で紹介しています。", "videoId": "K9ro89XEOTY", "start": 0, "vertical": true}, {"category": "シェイク", "q": "「カロリーオフじゃない」シェイクとは、どういうことですか？", "a": "ケトダイエットシェイクの考え方を、動画で解説しています。", "videoId": "Y5Sm5h9geJM", "start": 0, "vertical": true}, {"category": "MCTオイル", "q": "MCTオイルとは何ですか？どうやって使いますか？", "a": "KETO先生が、MCTオイルの基本と使い方を解説しています。", "videoId": "VXhd1-_oiOI", "start": 0, "vertical": true}, {"category": "MCTオイル", "q": "MCTオイルは、何にかけたり混ぜたりすればいいですか？", "a": "かける・混ぜるの簡単な使い方を、動画で紹介しています。", "videoId": "IF43d3sWcjc", "start": 0, "vertical": true}, {"category": "MCTオイル", "q": "MCTオイルでお腹がゆるくなったときは、どうすればいいですか？", "a": "量の調整など、気をつけたいポイントを動画で解説しています。", "videoId": "vIQ86ZHycF0", "start": 0, "vertical": true}, {"category": "MCTオイル", "q": "MCTオイルをとりすぎると、どうなりますか？", "a": "とる量の目安と注意点を、動画で解説しています。", "videoId": "JGNKaqp6llw", "start": 0, "vertical": true}, {"category": "MCTオイル", "q": "粉タイプのMCTもありますか？", "a": "粉タイプのMCTについて、動画で紹介しています。", "videoId": "nNstBkbb310", "start": 0, "vertical": true}, {"category": "MCTオイル", "q": "MCTオイルを使ったドレッシングの作り方は？", "a": "1分で作れる手作りドレッシングを、動画で紹介しています。", "videoId": "r2JV8wRxkqc", "start": 0, "vertical": true}, {"category": "ケトン体", "q": "BHBとは何ですか？MCTオイルとの違いは？", "a": "BHBとMCTオイルの違いを、動画で簡単に解説しています。", "videoId": "SfarTqEma64", "start": 0, "vertical": true}, {"category": "ケトン体", "q": "1日の中で、ケトン体をどう取り入れればいいですか？", "a": "1日のルーティンの例を、動画で紹介しています。", "videoId": "dHV5GTsClmU", "start": 0, "vertical": true}, {"category": "そのほかの商品", "q": "ケトバターコーヒーとは何ですか？", "a": "KETO先生が、ケトバターコーヒーについて解説しています。", "videoId": "xf67u7xwf9o", "start": 0, "vertical": true}, {"category": "そのほかの商品", "q": "ケトスイートとは何ですか？どうやって使いますか？", "a": "KETO先生が、ケトスイートの使い方を解説しています。", "videoId": "a3u8eHFzB8U", "start": 0, "vertical": true}]};
+  let qaData = QA_FALLBACK, qaCat = 'すべて', qaWord = '';
+  async function loadQA(){
+    try{
+      const r = await fetch('qa.json', {cache:'no-cache'});
+      if(r.ok){ const d = await r.json(); if(d && Array.isArray(d.items)) qaData = d; }
+    }catch(e){}
+    renderQA();
+  }
+  const validId = v => typeof v === 'string' && /^[\w-]{11}$/.test(v);
+  function renderQA(){
+    const items = (qaData.items || []).filter(x => x && x.q && validId(x.videoId));
+    const cats = ['すべて', ...(qaData.categories || [...new Set(items.map(x => x.category).filter(Boolean))])];
+    const catEl = document.getElementById('qaCats');
+    catEl.innerHTML = cats.map(c => `<button class="qa-cat ${c===qaCat?'on':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+    catEl.querySelectorAll('.qa-cat').forEach(b => b.addEventListener('click', () => { qaCat = b.dataset.cat; renderQA(); }));
+    const w = qaWord.trim().toLowerCase();
+    const list = items.filter(x => (qaCat === 'すべて' || x.category === qaCat) && (!w || (x.q + ' ' + (x.a||'') + ' ' + (x.category||'')).toLowerCase().includes(w)));
+    const el = document.getElementById('qaList');
+    if(!list.length){ el.innerHTML = '<div class="qa-empty">該当する質問がありません。ことばを変えて探してみてください。</div>'; return; }
+    el.innerHTML = list.map((x, i) => `<div class="qa-item" data-i="${items.indexOf(x)}">
+        <button class="qa-q" aria-expanded="false"><span class="mk">Q</span><span>${esc(x.q)}</span><span class="ar">▾</span></button>
+        <div class="qa-a">${esc(x.a || '動画でくわしく解説しています。')}<br><button class="qa-play"><span>▶</span>動画で見る</button></div>
+      </div>`).join('');
+    el.querySelectorAll('.qa-item').forEach(it => {
+      const x = items[+it.dataset.i];
+      it.querySelector('.qa-q').addEventListener('click', e => { const open = it.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', open); });
+      it.querySelector('.qa-play').addEventListener('click', () => openVideo(x));
+    });
+  }
+  document.getElementById('qaSearch').addEventListener('input', e => { qaWord = e.target.value; if(qaWord.trim()) qaCat = 'すべて'; renderQA(); });
+  function openVideo(x){
+    const start = Math.max(0, parseInt(x.start, 10) || 0);
+    const src = `https://www.youtube-nocookie.com/embed/${x.videoId}?start=${start}&playsinline=1&rel=0&modestbranding=1`;
+    openPanel(`<div class="eyebrow">Movie</div><div class="h2">${esc(x.q)}</div>
+      <div class="video-wrap ${x.vertical === false ? 'h' : 'v'}"><iframe src="${src}" title="${esc(x.q)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+      <p class="muted" style="margin-top:12px">${esc(x.a || '')}</p>
+      <div class="sheet-note">動画はYouTubeで再生されます。うまく再生できないときは <a href="https://www.youtube.com/watch?v=${x.videoId}" target="_blank" rel="noopener">YouTubeで開く</a> を押してください。</div>`);
+  }
+
   // ================= 全体描画 =================
   function renderAll(){ renderProgram(); renderToday(); renderStats(); renderShare(); renderWeight(); renderCal(); }
   renderAll();
+  renderQA(); loadQA();
   if(!st.onboarded) openOnboarding(0, true); else maybeShowA2hs();
 
   let lastKey = keyOf(today());
